@@ -1,0 +1,16 @@
+#! /bin/sh
+
+# This is the first shell script in the book Linux程序设计
+# This script search for the string "POSIX" in all of files
+# and it will print the file's content which have string "POSIX"
+
+for file in *
+do
+	if grep -l POSIX $file
+	then
+		echo $file
+	fi
+done
+
+# 退出状态码是很重要的，用来判断程序是否正常执行
+exit 0
