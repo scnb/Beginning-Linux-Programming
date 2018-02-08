@@ -182,7 +182,7 @@ void draw_menu(char *options[], int current_highlight, int start_row, int start_
 			attron(A_STANDOUT);
 		}
 		txt_ptr = options[current_row];
-		txt_ptr++;
+	//	txt_ptr++;
 		mvprintw(start_row + current_row, start_col, "%s", txt_ptr);
 		if (current_row == current_highlight)
 		{
@@ -275,8 +275,8 @@ void get_string(char *string)
 int get_confirm()
 {
 	int confirmed = 0;
-	char first_char;
-	mvprintw(Q_LINE, 5, "Are you sure?");
+	char first_char = 'N';
+	mvprintw(Q_LINE, 5, "Are you sure? ");
 	clrtoeol();
 	refresh();
 
@@ -315,7 +315,6 @@ void insert_title(char *cdtitle)
 	}
 }
 
-
 /* 允许用户重新输入当前CD唱片中的曲目 */
 void update_cd()
 {
@@ -344,7 +343,7 @@ void update_cd()
 
 	/* 先建立一个子窗口，围绕它画一个框，然后在这个带边框的子窗口内再添加一个新的卷屏子窗口 */
 	box_window_ptr = subwin(stdscr, BOXED_LINES + 2, BOXED_ROWS + 2, BOX_LINE_POS - 1, BOX_ROW_POS - 1);
-	if (!sub_window_ptr)
+	if (!box_window_ptr)
 	{
 		return;
 	}
