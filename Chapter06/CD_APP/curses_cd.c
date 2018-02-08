@@ -11,7 +11,7 @@
 #define MESSAGE_LINE	6	/* messages on this line */
 #define ERROR_LINE		22	/* line to use for errors */
 #define Q_LINE			20	/* line for questions */
-#define PROMPT_LINE		18	/* line for prompting on */
+#define PROMPT_LINE		18	/* line for prompting on，提示符 */
 
 /* 与更新数据库记录有关的一些全局常量 */
 #define BOXED_LINES		11
@@ -20,7 +20,7 @@
 #define BOX_ROW_POS		2
 
 /* 定义一些全局变量 */
-static char current_cd[MAX_STRING] = "\0";		/* 保存正在处理的当前CD唱片的标题 */
+static char current_cd[MAX_STRING] = "\0";		/* 保存正在处理的当前CD唱片的标题，初始化为无CD */
 static char current_cat[MAX_STRING];			/* 记录当前CD唱片的分类号 */
 
 /* 一些文件名的声明 */
@@ -46,7 +46,9 @@ void update_cd(void);
 
 
 /* 定义一些菜单结构，即菜单选项数组，当某一个选项被选中时，返回选项的第一个字符 */
-char *main_menu[] = {
+
+char *main_menu[] = 
+{
 	"add new CD",
 	"find CD",
 	"count CDs and tracks in the catalog",
@@ -54,7 +56,8 @@ char *main_menu[] = {
 	0,
 };
 
-char *extended_menu[] = {
+char *extended_menu[] = 
+{
 	"add new CD",
 	"find CD",
 	"count CDs and tracks in the catalog",
@@ -102,6 +105,7 @@ int getchoice(char *greet, char *choices[])
 	int key = 0;
 
 	option = choices;
+	/* 通过对option循环，来确认是菜单有几行 */
 	while (*option)
 	{
 		max_row++;
@@ -116,6 +120,7 @@ int getchoice(char *greet, char *choices[])
 	clear_all_screen();
 	mvprintw(start_screenrow -2, start_screencol, greet);
 	keypad(stdscr, TRUE);
+	/* 设置键盘为cbreak模式，一旦有字符输入就被程序读取 */
 	cbreak();
 	noecho();
 	key = 0;
@@ -145,6 +150,7 @@ int getchoice(char *greet, char *choices[])
 				selected_row++;
 			}
 		}
+		/* choices[selected_row]把字符串取出来，再用*号取出字符串的首字母，非常好的操作 */
 		selected = *choices[selected_row];		//根据选中的行号来确定选项
 		draw_menu(choices, selected_row, start_screenrow, start_screencol);
 		key = getch();	//获取按键信息	
@@ -185,7 +191,7 @@ void draw_menu(char *options[], int current_highlight, int start_row, int start_
 		current_row++;
 		option_ptr++;
 	}
-	mvprintw(start_row + start_row + 3, start_col, "Move highlight then press Return");
+	mvprintw(start_row + current_row + 3, start_col, "Move highlight then press Return");
 	refresh();
 }
 
@@ -328,6 +334,7 @@ void update_cd()
 		return ;
 	}
 	move(PROMPT_LINE, 0);
+	/* 清除当前行 */
 	clrtoeol();
 
 	remove_tracks();
@@ -367,6 +374,7 @@ void update_cd()
 			fprintf(tracks_fp, "%s,%d,%s\n", current_cat, track,track_name);
 		}
 		track++;
+		/* 若需要使用的行数大于边框的范围，则卷屏 */
 		if (screen_line > BOXED_LINES - 1)
 		{
 			scroll(sub_window_ptr);
@@ -403,6 +411,7 @@ void remove_cd()
 	titles_fp = fopen(title_file, "r");
 	temp_fp = fopen(temp_file, "w");
 
+	/* 与remove_tracks的思路一样，通过临时文件保存不匹配的CD来变相删除当前选中的CD */
 	while (fgets(entry, MAX_ENTRY, titles_fp))
 	{
 		if (strncmp(current_cat, entry , cat_length) != 0)
@@ -431,11 +440,13 @@ void remove_tracks()
 	char entry[MAX_ENTRY + 1];
 	int cat_length;
 
+	/* 先判断当前是否选中了某个CD */
 	if (current_cd[0] == '\0')
 	{
 		return ;
 	}
 
+	/* 获取当前CD目录名称的长度 */
 	cat_length = strlen(current_cat);
 	tracks_fp = fopen(tracks_file, "r");
 	if (tracks_fp == (FILE *)NULL)
@@ -444,6 +455,7 @@ void remove_tracks()
 	}
 	temp_fp = fopen(temp_file, "w");
 
+	/* 删除某CD的思路是这样的：通过fgets从原文件中一次读取一行，然后与current_cat进行比较，若不相等则把该行字符串写入临时文件中，这样变相的删除了匹配的CD */
 	while (fgets(entry, MAX_ENTRY, tracks_fp))
 	{
 		if (strncmp(current_cat, entry, cat_length) != 0)
@@ -501,14 +513,16 @@ void find_cd()
 	char *found, *title, *catalog;
 
 	mvprintw(Q_LINE, 0, "Enter a string to search for in CD titles: ");
-	get_string(match);
+	get_string(match);	//获取用户的输入
 
 	titles_fp = fopen(title_file, "r");
 	if (titles_fp)
 	{
+		/* fgets()函数从titles_fp流中读取最多MAX_ENTRY个字符 */
 		while (fgets(entry, MAX_ENTRY, titles_fp))
 		{
 			catalog = entry;
+			/* strstr(A,B)函数返回子串B在母串A中第一次出现的位置（指针) */
 			if (found = strstr(catalog, ","))
 			{
 				*found = '\0';
@@ -516,6 +530,7 @@ void find_cd()
 				if (found = strstr(title, ","))
 				{
 					*found = '\0';
+					/* 若找到匹配的标题，则将CD信息赋值给current_cd和current_cat */
 					if (found = strstr(title, match))
 					{
 						count++;
@@ -555,9 +570,10 @@ void list_tracks()
 	int key;
 	int first_line = 0;
 
+	/* 判断用户当前是否选中了一个CD */
 	if (current_cd[0] == '\0')
 	{
-		mvprintw(ERROR_LINE, 0, "You must select a CD first.");
+		mvprintw(ERROR_LINE, 0, "You must select a CD first.", stdout);
 		get_return();
 		return ;
 	}
@@ -592,6 +608,7 @@ void list_tracks()
 	}
 	mvprintw(4,0, "CD Track Listing\n");
 	 
+	/* 将曲目的信息写到pad中 */
 	while (fgets(entry, MAX_ENTRY, tracks_fp))
 	{
 		if (strncmp(current_cat, entry, cat_length) == 0)
@@ -601,6 +618,7 @@ void list_tracks()
 	}
 	fclose(tracks_fp);
 
+	/* 如果曲目信息量太大，占用的行数超过了边框的范围，则需要滚动 */
 	if (lines_op > BOXED_LINES)
 	{
 		mvprintw(MESSAGE_LINE, 0, "Cursor keys to scroll, RETURN or q to exit");
@@ -611,9 +629,12 @@ void list_tracks()
 	}
 	wrefresh(stdscr);
 	keypad(stdscr, TRUE);
+	/* 设置键盘为cbreak模式，字符一经输入就被立刻传递给程序 */
 	cbreak();
 	noecho();
 	key = 0;
+
+	/* 根据用户按键，调整first_line的值 */
 	while (key != 'q' && key != KEY_ENTER && key != '\n')
 	{
 		if (key == KEY_UP)
