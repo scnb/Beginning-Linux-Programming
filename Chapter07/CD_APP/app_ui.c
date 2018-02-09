@@ -91,6 +91,11 @@ void main(int argc, char *argv[])
 				break;
 			case mo_del_cat:
 				del_cat_entry(&current_cdc_entry);
+				/* 很激动，我修复了原书上的一个BUG，即删除目录后，选择6列出曲目内容还能显示刚才的目录内容
+				   修复办法：添加下面这句话，即在删除目录后，将current_cdc_entry清空，则后面显示屏幕时会
+				   			 回到精简模式
+				*/
+				memset(&current_cdc_entry, '\0', sizeof(current_cdc_entry));
 				break;
 			case mo_find_cat:
 				current_cdc_entry = find_cat();
