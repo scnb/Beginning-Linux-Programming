@@ -1,0 +1,8 @@
+CREATE TABLE children
+(
+	childno INTEGER AUTO_INCREMENT NOT NULL PRIMARY KEY,
+	fname VARCHAR(30),
+	age INTEGER
+);
+
+
