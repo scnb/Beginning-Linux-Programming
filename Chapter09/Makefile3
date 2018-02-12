@@ -1,0 +1,44 @@
+all:	myapp
+
+CC = gcc
+
+INSTDIR = /home/neuqsc/文档/Linux程序设计
+
+INCLUDE = 
+
+CFLAGS = -g -Wall -ansi
+
+# 发行版的编译选项
+# CFLAGS = -O -wall -ansi
+
+myapp:	main.o 2.o 3.o
+	$(CC) -o myapp main.o 2.o 3.o
+
+main.o:	main.c a.h
+	$(CC) -I$(INCLUDE) $(CFLAGS) -c main.c 
+
+2.o:	2.c a.h b.h
+	$(CC) -I$(INCLUDE) $(CFLAGS) -c 2.c
+
+3.o:	3.c b.h c.h
+	$(CC) -I$(INCLUDE) $(CFLAGS) -c 3.c
+
+
+# clean行的后面没有任何依赖关系，因此该目标总被认为是过时的，所以在执行make命令时，clean对应的语句总被执行
+# -的作用：让make命令忽略rm执行的所有错误
+clean:
+	-rm main.o 2.o 3.o
+
+# @的作用是：让make在执行下面这些shell脚本前不显示这些命令本身
+# 必须在每行shell代码后面加上一个反斜杠，用于使所有的shell命令在同一个逻辑行上
+# 在每条shell语句的后面加上一个 && 表示与，只有在上一条命令执行成功的条件下，后一条命令才可以执行
+install:	myapp
+	@if [ -d $(INSTDIR) ];\
+		then \
+		cp myapp $(INSTDIR) && \
+		chmod a+x $(INSTDIR)/myapp && \
+		chmod og-w $(INSTDIR)/myapp && \
+		echo "Installed in $(INSTDIR)" ;\
+	else \
+		echo "Sorry, $(INSTDIR) does not exist"; false; \
+	fi
