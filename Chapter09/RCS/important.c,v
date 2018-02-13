@@ -1,0 +1,78 @@
+head	1.3;
+access;
+symbols;
+locks
+	neuqsc:1.3; strict;
+comment	@ * @;
+
+
+1.3
+date	2018.02.13.10.07.07;	author neuqsc;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2018.02.13.09.53.30;	author neuqsc;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2018.02.13.09.49.57;	author neuqsc;	state Exp;
+branches;
+next	;
+
+
+desc
+@This is an important demonstration file
+@
+
+
+1.3
+log
+@Added $RCSfile$ and $Id$ strings
+@
+text
+@/* 
+   This is an important file for managing this project.
+   It implements the canonical "Hello World" program.
+*/
+
+#include <stdlib.h>
+#include <stdio.h>
+
+/* 可以根据make命令的内置规则（推导规则）来简化甚至不用编写makefile文件
+   例如编译本程序可以使用如下命令：
+   make foo
+   或者通过在命令行上修改宏来改变其默认行为：
+   make CC=gcc CFLAGS="-g -Wall" foo
+*/
+
+static char *RCSinfo = "$Id$";
+
+int main()
+{
+	printf("Hello, World\n");
+	printf("This is an extra line added later\n");
+	printf("This file is under RCS control. Its ID is \n%s\n", RCSinfo);
+	exit (EXIT_SUCCESS);
+}
+@
+
+
+1.2
+log
+@Added an extra line to be printed out.
+@
+text
+@d16 2
+d22 1
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d19 1
+@
