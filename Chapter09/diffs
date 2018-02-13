@@ -1,0 +1,11 @@
+1c1
+< This is file one
+---
+> This is file two
+4c4,5
+< There is no line 4, this is line 5
+---
+> line 4
+> line 5
+5a7
+> a new line 8
