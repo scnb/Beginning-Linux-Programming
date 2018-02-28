@@ -16,6 +16,13 @@
    IBMPowerPC	32位 int 4字节 字节序：4-3-2-1
 */
 
+/* Note：上面的BUG已修复
+	unsigned long int htonl(unsigned long int hostlong);
+	长整数从主机字节序到网络字节序的转换
+	unsigned short int htons(unsigned short int hostshort);
+	短整数从主机字节序到网络字节序的转换
+*/
+
 
 
 int main()
@@ -32,8 +39,9 @@ int main()
 	/* 为服务器套接字命名 */
 	address.sin_family = AF_INET;
 	/* 使用inet_addr函数将IP地址的文本表示方式转换为符合套接字地址要求的格式 */
+	/* 不需要对函数调用inet_addr进行转换，因为该函数已被定义为产生一个网络字节序 */
 	address.sin_addr.s_addr = inet_addr("127.0.0.1");
-	address.sin_port = 9734;
+	address.sin_port = htons(9734);
 	len = sizeof(address);
 
 	/* 将客户端套接字与服务器套接字相连接 */
@@ -41,7 +49,7 @@ int main()
 	
 	if (result == -1)
 	{
-		perror("oops:client2");
+		perror("oops:client3");
 		exit (1);
 	}
 

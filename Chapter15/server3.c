@@ -12,6 +12,14 @@
    IBMPowerPC	32位 int 4字节 字节序：4-3-2-1
 */
 
+/* Note：上面的BUG已修复
+	unsigned long int htonl(unsigned long int hostlong);
+	长整数从主机字节序到网络字节序的转换
+	unsigned short int htons(unsigned short int hostshort);
+	短整数从主机字节序到网络字节序的转换
+*/
+
+
 int main()
 {
 	int server_sockfd, client_sockfd;
@@ -24,8 +32,9 @@ int main()
 
 	/* 命名该套接字 */
 	server_address.sin_family = AF_INET;
-	server_address.sin_addr.s_addr = inet_addr("127.0.01");
-	server_address.sin_port = 9734;
+	/* INADDR_ANY表示允许到达服务器任一网络接口的连接 */
+	server_address.sin_addr.s_addr = htonl(INADDR_ANY);
+	server_address.sin_port = htons(9734);
 	server_len = sizeof(server_address);
 	bind(server_sockfd, (struct sockaddr *)&server_address, server_len);
 
